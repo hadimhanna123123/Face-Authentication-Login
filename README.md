@@ -11,6 +11,16 @@ This project implements a dual-authentication mechanism where:
 
 When a user attempts to log in via webcam, both their face and gesture must match the expected values for authentication to succeed.
 
+### Screenshots
+
+**Login Page**
+
+![Login Page](read_me_images/login_page_image.png)
+
+**Welcome Page (After Successful Authentication)**
+
+![Welcome Page](read_me_images/welcome_page.png)
+
 ## 🏗️ Architecture
 
 The project is split into two main components:

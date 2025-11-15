@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/styleLogin.css">
+    <script type="text/javascript" src="https://unpkg.com/webcam-easy/dist/webcam-easy.min.js"></script>
+</head>
+<body>
+    
+    <div class="header">
+    
+        <!--Content before waves-->
+        <div class="inner-header flex">
+
+<div class="logo">
+            <img src="/images/logo.png" height="180px"/>
+        <h1 id="header">Login with Your Photo</h1>
+        <h3>Do the A sign with your hand</h3>
+        
+</div>
+         <div class="container">
+        <video id="webcam" autoplay playsinline width="640" height="480"></video>
+</br> </br>
+        <button id="captureButton"class="bookmarkBtn">
+            <span class="IconContainer">
+                <svg viewBox="0 0 24 24" height="1em" class="icon">
+                    <path fill="currentColor"
+                        d="M20,5h-4.18c-0.59-1.21-1.34-2.31-2.24-3.23C12.31,1.37,11.66,1,11,1S9.69,1.37,8.42,1.77 C7.52,2.69,6.77,3.79,6.18,5H4C2.9,5,2,5.9,2,7v14c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V7C22,5.9,21.1,5,20,5z M12,17 c-2.21,0-4-1.79-4-4s1.79-4,4-4s4,1.79,4,4S14.21,17,12,17z M19,9H8.82c-0.08-0.35-0.2-0.69-0.35-1H19V9z M20,20H4V7h1.55 C6.15,8.16,6,8.57,6,9c0,2.76,2.24,5,5,5s5-2.24,5-5c0-0.43-0.15-0.84-0.41-1.17L17,10h3V20z" />
+                </svg>
+            </span>
+            <p class="text">Take Photo</p>
+        </button>
+
+        </div>
+    <canvas id="canvas" class="d-none"></canvas>
+    <audio id="snapSound" src="audio/snap.wav" preload="auto"></audio>
+        
+        <a id="downloadLink" style="display: none;">Download Photo</a>
+        </div>
+    
+        <!--Waves Container-->
+        <div>
+            <div class="sign-carousal">
+            
+            </div>
+            <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                <defs>
+                    <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                </defs>
+                <g class="parallax">
+                    <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
+                    <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+                    <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+                    <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+                </g>
+            </svg>
+        </div>
+        <!--Waves end-->
+    
+       
+    <!--Header ends-->
+
+    <script>
+        let currentIndex = 1; 
+            let timer;
+
+            const carousal = {
+                init: function (object) {
+                    const { el, banners, interval } = object;
+
+                    // banner
+                    const length = banners.length;
+                    if (length === 1) {
+                        banners.push(banners[0]);
+                        banners.push(banners[0])
+                    }
+                    if (length === 2) {
+                        banners.push(banners[0]);
+                    }
+                    this._render(el, banners);
+                    timer = setInterval(this._next.bind(this), interval);
+                    this.listenPaginationTouch.apply(this);
+                },
+
+                _render: function (el, banners) {
+                    const imgUl = document.createElement('div');
+                    imgUl.className = 'banner-list';
+                    let imgUlInnerHTML = '';
+
+                    const paginationBox = document.createElement('div');
+                    paginationBox.className = 'pagination-box';
+                    let paginationBoxInnerHTML = '';
+
+                    banners.forEach((item, index) => {
+                        imgUlInnerHTML += `<div class="banner-item ${index === 0 ? 'banner-item-prev' : ''} ${index === 1 ? 'banner-item-current' : ''} ${index === 2 ? 'banner-item-next' : ''} ${index > 2 ? 'banner-item-out' : ''}"><img src="${item.imageUrl}"></div>`;
+
+                        paginationBoxInnerHTML += `<div class="pagination-item index-${index} ${index === currentIndex ? 'active' : ''}"></div>`
+                    });
+                    imgUl.innerHTML = imgUlInnerHTML;
+                    paginationBox.innerHTML = paginationBoxInnerHTML;
+                    el.appendChild(imgUl);
+                    el.appendChild(paginationBox);
+                },
+
+              
+                _next: function () {
+                    let bannerList = document.querySelectorAll('.banner-item');
+                    let length = bannerList.length;
+                    currentIndex = (currentIndex + 1) % length;
+                    this._changeNextOrder(currentIndex);
+                    this._renderPagination(currentIndex);
+                },
+
+              
+                _changeNextOrder: function (_currentIndex) {
+                    let bannerList = document.querySelectorAll('.banner-item');
+                    let length = bannerList.length;
+
+                    bannerList.forEach((item, index) => {
+                        if (index === _currentIndex) {
+                            item.className = 'banner-item banner-item-current'
+                        } else if (index === ((_currentIndex - 1 + length) % length)) {
+                            item.className = 'banner-item banner-item-prev'
+                        } else if (index === ((_currentIndex + 1) % length)) {
+                            item.className = 'banner-item banner-item-next'
+                        } else {
+                            item.className = 'banner-item banner-item-out'
+                        }
+                    })
+                },
+
+                _renderPagination: function (_currentIndex) {
+                    let paginationList = document.querySelectorAll('.pagination-item');
+                    paginationList.forEach((item, index) => {
+                        if (index === _currentIndex) {
+                            item.classList.add('active');
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    })
+                },
+
+             
+                listenPaginationTouch: function () {
+                    let paginationBox = document.querySelector('.pagination-box');
+                    paginationBox.addEventListener('click', (event) => {
+                        const target = event.target;
+                        if (target.classList.contains('pagination-item')) {
+                            try {
+                                let className = target.classList[1];
+                                let index = Number(className.split('-')[1]);
+                                this._changeNextOrder(index);
+                                this._renderPagination(index);
+                                currentIndex = index;
+                                clearInterval(timer);
+                                timer = setInterval(this._next.bind(this), 5000);
+                            } catch (error) {
+                                throw new Error(error);
+                            }
+                        }
+                    })
+                }
+            }
+
+            const carousalDom = document.querySelector('.sign-carousal');
+            const banners = [
+                {
+                    imageUrl: "/images/A.jpg"
+                },
+                {
+                    imageUrl: "/images/B.jpg"
+                },
+                {
+                    imageUrl: "/images/L.jpg"
+                }
+            ]
+            carousal.init({
+                el: carousalDom,
+                banners,
+                interval: 5000
+            });
+        </script>
+
+
+    
+    <script>
+        const webcamElement = document.getElementById('webcam');
+        const canvasElement = document.getElementById('canvas');
+        const snapSoundElement = document.getElementById('snapSound');
+        const captureButton = document.getElementById('captureButton');
+        const downloadLink = document.getElementById('downloadLink');
+        const webcam = new Webcam(webcamElement, 'user', canvasElement, snapSoundElement);
+
+        webcam.start()
+            .then(result => {
+                console.log("Webcam started");
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
+        captureButton.addEventListener('click', () => {
+            const picture = webcam.snap();
+            snapSoundElement.play();
+            downloadLink.href = picture;
+            downloadLink.download = 'captured_photo.png';
+            downloadLink.style.display = 'block';
+
+            // Send this image to the server
+            fetch('http://localhost:3000/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ image: picture })
+            })
+            // .then(response => response.json())
+            .then(data => {
+    if (data.url) {
+        window.location.href = data.url;
+    } else {
+        console.error('No redirect URL provided:', data);
+    }
+})
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+
+
+</body>
+</html>
